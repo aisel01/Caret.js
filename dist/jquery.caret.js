@@ -274,10 +274,9 @@ InputCaret = (function() {
       pos = this.getPos();
     }
     start_range = $inputor.val().slice(0, pos);
-    end_range = $inputor.val().slice(pos);
+    end_range = $inputor.val().slice(pos) || '.';
     html = "<span style='position: relative; display: inline;'>" + format(start_range) + "</span>";
-    html += "<span id='caret' style='position: relative; display: inline;'>|</span>";
-    html += "<span style='position: relative; display: inline;'>" + format(end_range) + "</span>";
+    html += "<span id='caret' style='position: relative; display: inline;'>" + format(end_range) + "</span>";
     mirror = new Mirror($inputor);
     return at_rect = mirror.create(html).rect();
   };
@@ -334,13 +333,15 @@ Mirror = (function() {
   };
 
   Mirror.prototype.rect = function() {
-    var $flag, pos, rect;
-    $flag = this.$mirror.find("#caret");
-    pos = $flag.position();
+    var mirrPos, caretPos, rect;
+
+    mirrPos = this.$mirror[0].getBoundingClientRect();
+    caretPos = this.$mirror.find("#caret")[0].getClientRects()[0];
+
     rect = {
-      left: pos.left,
-      top: pos.top,
-      height: $flag.height()
+      left: caretPos.left - mirrPos.left,
+      top: caretPos.top - mirrPos.top,
+      height: caretPos.height
     };
     this.$mirror.remove();
     return rect;
